@@ -20,7 +20,6 @@ class ClienteMongoAtlas:
         self.coleccion = None
 
     def conectar(self):
-        """Conecta con MongoDB Atlas y selecciona la colección signos_vitales."""
         if not self.uri:
             raise ValueError("Debes ingresar o configurar la URI de conexión de MongoDB Atlas.")
         try:
@@ -33,7 +32,6 @@ class ClienteMongoAtlas:
             raise ConnectionError("No fue posible conectar a MongoDB Atlas: {}".format(e))
 
     def insertar_validados(self, registros_validados):
-        """Inserta los registros validados en la colección signos_vitales."""
         if self.coleccion is None:
             self.conectar()
         if not registros_validados:
@@ -43,7 +41,6 @@ class ClienteMongoAtlas:
         return len(resultado.inserted_ids)
 
     def promedio_frecuencia_cardiaca(self):
-        """Calcula el promedio de frecuencia cardíaca de los documentos en signos_vitales."""
         if self.coleccion is None:
             self.conectar()
         docs = list(self.coleccion.find({}, {"_id": 0, "fc": 1}))
@@ -53,20 +50,17 @@ class ClienteMongoAtlas:
         return round(sum(valores) / len(valores), 2) if valores else 0.0
 
     def documentos_spo2_menor_94(self):
-        """Consulta los documentos con SpO2 menor a 94."""
         if self.coleccion is None:
             self.conectar()
         docs = list(self.coleccion.find({}, {"_id": 0}))
         return [d for d in docs if obtener_spo2_entero(d) < 94]
 
     def consultar_por_id(self, id_buscado):
-        """Consulta un registro específico por su ID (ejemplo: 'ID-001')."""
         if self.coleccion is None:
             self.conectar()
         return self.coleccion.find_one({"id": id_buscado.strip()}, {"_id": 0})
 
     def exportar_consultas_json(self, ruta_archivo="resultados mongo.json"):
-        """Exporta las consultas (promedio FC y SpO2 < 94) a 'resultados mongo.json'."""
         destino = Path(ruta_archivo)
         destino.parent.mkdir(parents=True, exist_ok=True)
 
